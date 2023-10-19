@@ -52,9 +52,7 @@ size_t _strlen(char *str)
  * @s1: The first string that receives
  * @s2: The second string that receives
  * @n: The number of bytes that you need copy
- *
- * Return: On success 1.
- * On error, -1 is returned, and errno is set appropriately.
+ * Return: On success 1, -1 on error
  */
 
 char *string_nconcat(char *s1, char *s2, unsigned int n)
@@ -95,11 +93,6 @@ char *string_nconcat(char *s1, char *s2, unsigned int n)
 	}
 	ar[i] = '\0';
 	return (ar);
-	if (ar == NULL)
-	{
-		free(ar);
-		return (NULL);
-	}
 }
 
 /**
