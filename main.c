@@ -8,7 +8,7 @@
 int main(void)
 {
 	sh_t data;
-	int pl;
+	/*int pl;*/
 
 	_memset((void *)&data, 0, sizeof(data));
 	signal(SIGINT, signal_handler);
@@ -26,15 +26,9 @@ int main(void)
 			free_data(&data);
 			continue;
 		}
-		pl = parse_line(&data);
-		if (pl == 0)
+		if (parse_line(&data) == 0)
 		{
 			free_data(&data);
-			continue;
-		}
-		if (pl < 0)
-		{
-			print_error(&data);
 			continue;
 		}
 		if (process_cmd(&data) < 0)
@@ -45,7 +39,7 @@ int main(void)
 		free_data(&data);
 	}
 	free_data(&data);
-	exit(EXIT_SUCCESS);
+	return (0);
 }
 
 /**
