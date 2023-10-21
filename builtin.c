@@ -1,67 +1,29 @@
 #include "shell.h"
-
 /**
- * is_builtin - This program checks to see if a command is
- * a builtin function and if so, executes it
- * @cmd: a vector array of command line arguments
- * @b: line_buffer created in main
- *
- * Return: 1 if command is a builtin, 0 otherwise
+ * run_builtin - checking arg_list for builtins and executing found cmd.
+ * @arg_list: argument list
+ * @env_p: enviorn list
+ * @buf_size: buffer size
+ * Return: 0 on found builtin, 1 on found nothing, 2 on builtin error
  */
-
-int is_builtin(char **cmd, char *b)
+int run_builtin(char **arg_list, env_t *env_p, int buf_size)
 {
-	struct builtins builtins = { "env", "exit" };
+	int i, size, status;
+	builtin table[] = {
+	{"exit", hsh_exit},     {"env", hsh_env},
+	{"setenv", hsh_setenv}, {"unsetenv", hsh_unsetenv},
+	{"cd", hsh_cd},         {"history", hsh_history},
+	{"help", hsh_help},     {"alias", hsh_alias}
+	};
 
-	if (_strcmp(*cmd, builtins.env) == 0)
+	size = ARRAY_SIZE(table);
+	for (i = 0; i < size; i++)
 	{
-		env_builtin();
-		return (1);
+		if (_str_match_strict(arg_list[0], table[i].name))
+		{
+			status = table[i].func(arg_list, env_p, buf_size);
+			return (status);
+		}
 	}
-	else if (_strcmp(*cmd, builtins.exit) == 0)
-	{
-		exiter(cmd, b);
-		return (1);
-	}
-	else
-	{
-		return (0);
-	}
-}
-
-
-/**
- * exiter - This program frees the buffer and
- * exits the program
- * @cmd: a vector array of command line arguments
- * @b: line_buffer created in main
- *
- * Return: void
- */
-
-void exiter(char **cmd, char *b)
-{
-	free(b);
-	free_cmds(cmd);
-	exit(0);
-}
-
-
-/**
- * env_builtin - This program is prints the current
- * environment
- *
- * Return: 0
- */
-void env_builtin(void)
-{
-	int i = 0;
-	char **env = environ;
-
-	while (env[i])
-	{
-		write(STDOUT_FILENO, (const void *) env[i], _strlen(env[i]));
-		write(STDOUT_FILENO, "\n", 1);
-		i++;
-	}
+	return (1);
 }

@@ -1,106 +1,106 @@
 #include "shell.h"
-
 /**
- * main - This program operates as a simple shell
- * @argc: the number of command line arguments
- * @argv: pointer to an array of command line
- * arguments
- * @envp: environment variable
- *
- * Return: Always 0
- *
+ * main - Shell
+ * @argc: argument count
+ * @argv: a list of all arguments
+ * @envp: environmental variable list from the parent
+ * Return: 0 on success.
  */
-
-int main(int argc, char *argv[], char *envp[])
+int main(int argc, char **argv, char **envp)
 {
-	char *line_buffer = NULL, *pathcmd = NULL, *path = NULL;
-	size_t buffer_size = 0;
-	ssize_t chars_in_line = 0;
-	char **cmd = NULL, **paths = NULL;
-	(void) envp, (void) argv;
+	char **arg_list;
+	env_t *env_p;
+	int retrn_value;
+	buffer b = {NULL, BUFSIZE, 0};
+	(void)argc, (void)argv, (void)envp;
 
-	if (argc < 1)
-		return (-1);
-	signal(SIGINT, sighandle);
+	b.buf = safe_malloc(sizeof(char) * b.size);
+	arg_list = NULL;
+	retrn_value = 0;
+
+	env_p = create_envlist();
+	history_wrapper("", env_p, 'c');
+	signal(SIGINT, SIG_IGN);
+	signal(SIGINT, signal_handler);
 	while (1)
 	{
-		free_cmds(cmd);
-		free_cmds(paths);
-		free(pathcmd);
-		prompt_printer();
-		chars_in_line = getline(&line_buffer, &buffer_size, stdin);
-		if (chars_in_line < 0)
-			break;
-		info.ln_count++;
-		if (line_buffer[chars_in_line - 1] == '\n')
-			line_buffer[chars_in_line - 1]  = '\0';
-		cmd = token_maker(line_buffer);
-		if (cmd == NULL || *cmd == NULL || **cmd == '\0')
+		if (!more_cmds(&b, retrn_value))
+		{
+			print_cmdline();
+			_getline(&b, STDIN_FILENO, env_p);
+			history_wrapper(b.buf, env_p, 'a');
+		}
+		while (alias_expansion(&b, env_p))
+			;
+		variable_expansion(&b, env_p, retrn_value);
+		_getline_fileread(&b, env_p);
+		tokenize_buf(&b, &arg_list);
+		if (arg_list[0] == NULL)
 			continue;
-		if (check_type(cmd, line_buffer))
-			continue;
-		path = _getpath();
-		paths = token_maker(path);
-		pathcmd = try_paths(paths, cmd[0]);
-		if (pathcmd == NULL)
-			perror(argv[0]);
-		else
-			exec_cmd(pathcmd, cmd);
+		retrn_value = run_builtin(arg_list, env_p, b.size);
+		if (retrn_value != 0 && retrn_value != 2)
+			retrn_value = run_execute(arg_list, env_p, b.size);
 	}
-	if (chars_in_line < 0 && flags.interactive)
-		write(STDERR_FILENO, "\n", 1);
-	free(line_buffer);
 	return (0);
 }
-
-
 /**
- * prompt_printer - This program prints the prompt if the
- * shell is in interactive mode
+ * more_cmds - check the command line for the next command
+ * @b: buffer structure
+ * @retrn_value: Return value from last command
+ * Description: Controls the logic behind if multi-part input has more
+ *				commands to execute. Handles ; && and ||.
+ *				Will advance buffer to next command.
  *
- * Return: void
+ * Return: 1 if we have more commands to execute, 0 if we don't
  */
-void prompt_printer(void)
+int more_cmds(buffer *b, int retrn_value)
 {
-	if ((isatty(STDIN_FILENO) == 1) && (isatty(STDOUT_FILENO) == 1))
-		flags.interactive = 1;
-	if (flags.interactive)
-		write(STDERR_FILENO, "$ ", 2);
-}
+	if (b->bp == 0)
+		return (0);
 
-/**
- * sighandle - This program allows ctrl+C to be
- * printed by the shell
- * @n: signum
- *
- * Return: void
- */
-void sighandle(int n __attribute__((unused)))
-{
-	write(STDERR_FILENO, "\n", 1);
-	write(STDERR_FILENO, "$ ", 2);
-}
-
-
-/**
- * check_type - This program checks the command
- * types to see if it is a built-in or executable
- * with a pathname
- * @cmd: array of pointers to command line arguments
- * @b: line buffer returned by getline function
- *
- * Return: 1 if the command is executed, 0 otherwise
- */
-int check_type(char **cmd, char *b)
-{
-	if (is_builtin(cmd, b))
+	while (b->buf[b->bp] != '\0')
 	{
-		return (1);
+		if (b->buf[b->bp] == ';')
+		{
+			trim_cmd(b);
+			return (1);
+		}
+		if (b->buf[b->bp] == '&' && retrn_value == 0)
+		{
+			trim_cmd(b);
+			return (1);
+		}
+		if (b->buf[b->bp] == '|' && retrn_value != 0)
+		{
+			trim_cmd(b);
+			return (1);
+		}
+		b->bp++;
 	}
-	else if (**cmd == '/')
-	{
-		exec_cmd(cmd[0], cmd);
-		return (1);
-	}
+	b->bp = 0;
 	return (0);
+}
+/**
+ * trim_cmd - move past cmd flowcontrol point at given buffer position
+ * @b: buffer structure
+ * Description: Small helper function for function more_cmds. Advances
+ *				the buffer point past command control characters.
+ */
+void trim_cmd(buffer *b)
+{
+	int flag;
+
+	flag = 0;
+	while (b->buf[b->bp] == ';')
+		b->bp++, flag = 1;
+	if (flag)
+		return;
+
+	while (b->buf[b->bp] == '|')
+		b->bp++, flag = 1;
+	if (flag)
+		return;
+
+	while (b->buf[b->bp] == '&')
+		b->bp++;
 }
