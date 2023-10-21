@@ -3,7 +3,8 @@
  * _getenv - gets the path
  * @path_name: a pointer to the struct of data
  *
- * Return: NULL
+ * Return: (Success) a positive number
+ * ------- (Fail) a negative number
  */
 char *_getenv(char *path_name)
 {

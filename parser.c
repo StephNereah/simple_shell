@@ -3,7 +3,8 @@
  * is_path_form - chekc if the given fikenname is a path
  * @data: the data strucct pointer
  *
- * Return: (Success) integer
+ * Return: (Success)
+ * ------- (Fail) otherwise
  */
 int is_path_form(sh_t *data)
 {
@@ -16,10 +17,11 @@ int is_path_form(sh_t *data)
 }
 #define DELIMITER ":"
 /**
- * is_short_form - check if the given fikenname is short form
- * @data: the data struct pointer
+ * is_short_form - chekc if the given fikenname is short form
+ * @data: the data strucct pointer
  *
- * Return: void
+ * Return: (Success)
+ * ------- (Fail) otherwise
  */
 void is_short_form(sh_t *data)
 {
@@ -52,7 +54,8 @@ void is_short_form(sh_t *data)
  * is_builtin - checks if the command is builtin
  * @data: a pointer to the data structure
  *
- * Return: (Success) 0
+ * Return: (Success) 0 is returned
+ * ------- (Fail) negative number will returned
  */
 int is_builtin(sh_t *data)
 {

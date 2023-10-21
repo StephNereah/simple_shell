@@ -1,12 +1,12 @@
 #include "shell.h"
 
 #define SETOWD(V) (V = _strdup(_getenv("OLDPWD")))
-
 /**
  * change_dir - changes directory
  * @data: a pointer to the data structure
  *
- * Return: (Success) 0
+ * Return: (Success) 0 is returned
+ * ------- (Fail) negative number will returned
  */
 int change_dir(sh_t *data)
 {
@@ -43,13 +43,13 @@ int change_dir(sh_t *data)
 	}
 	return (SUCCESS);
 }
-
 #undef GETCWD
 /**
  * abort_prg - exit the program
  * @data: a pointer to the data structure
  *
- * Return: (Success) 0
+ * Return: (Success) 0 is returned
+ * ------- (Fail) negative number will returned
  */
 int abort_prg(sh_t *data __attribute__((unused)))
 {
@@ -72,12 +72,12 @@ int abort_prg(sh_t *data __attribute__((unused)))
 	free_data(data);
 	exit(code);
 }
-
 /**
  * display_help - display the help menu
  * @data: a pointer to the data structure
  *
- * Return: (Success) 0
+ * Return: (Success) 0 is returned
+ * ------- (Fail) negative number will returned
  */
 int display_help(sh_t *data)
 {
@@ -103,12 +103,12 @@ int display_help(sh_t *data)
 	PRINT("\n");
 	return (SUCCESS);
 }
-
 /**
  * handle_builtin - handle and manage the builtins cmd
  * @data: a pointer to the data structure
  *
- * Return: (Success) 0
+ * Return: (Success) 0 is returned
+ * ------- (Fail) negative number will returned
  */
 int handle_builtin(sh_t *data)
 {

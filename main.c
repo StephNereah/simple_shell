@@ -4,7 +4,6 @@
  * main - the main function
  *
  * Return: (Success) 0 always
- *
  */
 int main(void)
 {
@@ -53,8 +52,8 @@ int main(void)
  * read_line - read a line from the standard input
  * @data: a pointer to the struct of data
  *
- * Return: (Success) 0
- *
+ * Return: (Success) a positive number
+ * ------- (Fail) a negative number
  */
 int read_line(sh_t *data)
 {
@@ -96,8 +95,8 @@ int read_line(sh_t *data)
  * split_line - splits line to tokens
  * @data: a pointer to the struct of data
  *
- * Return: (Success) 0
- *
+ * Return: (Success) a positive number
+ * ------- (Fail) a negative number
  */
 int split_line(sh_t *data)
 {
@@ -135,7 +134,8 @@ int split_line(sh_t *data)
  * parse_line - parses arguments to valid command
  * @data: a pointer to the struct of data
  *
- * Return: (Success) 0
+ * Return: (Success) a positive number
+ * ------- (Fail) a negative number
  */
 int parse_line(sh_t *data)
 {
@@ -155,7 +155,8 @@ int parse_line(sh_t *data)
  * process_cmd - process command and execute process
  * @data: a pointer to the struct of data
  *
- * Return: (Success) 0
+ * Return: (Success) a positive number
+ * ------- (Fail) a negative number
  */
 int process_cmd(sh_t *data)
 {

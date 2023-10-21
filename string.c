@@ -6,6 +6,7 @@
  * @second: the second given source
  *
  * Return: (Success) to the newly string
+ * ------- (Fail) if it failed
  */
 char *_strcat(char *first, char *second)
 {
@@ -32,6 +33,7 @@ char *_strcat(char *first, char *second)
  * @str: the given string
  *
  * Return: (Success) the length of the string
+ * ------- (Fail) negative value
  */
 int _strlen(char *str)
 {
@@ -46,7 +48,8 @@ int _strlen(char *str)
  * @s1: the first given string
  * @s2: the second given string
  *
- * Return: (Success) 0
+ * Return: (Success) a positive number
+ * ------- (Fail) a negative number
  */
 int _strcmp(char *s1, char *s2)
 {
@@ -71,8 +74,8 @@ int _strcmp(char *s1, char *s2)
  * @str: the given string
  * @c: the given string
  *
- * Return: (Success) a pointer to the first occurence of c or
- * (Fail) return a null pointer
+ * Return: (Success) a pointer to the first occurence of c
+ * ------- (Fail) return a null pointer
  */
 char *_strchr(char *str, char c)
 {
@@ -89,7 +92,8 @@ char *_strchr(char *str, char c)
  * _strdup - dupicates string
  * @str: the given string
  *
- * Return: (Success) a pointer to the duplicate
+ * Return: (Success) a pointer to the duplicated string
+ * ------- (Fail) return a null pointer
  */
 char *_strdup(char *str)
 {

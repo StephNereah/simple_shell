@@ -56,7 +56,8 @@ char *_memset(char *s, char byt, unsigned int n)
  * free_data - frees data
  * @data: the data structure
  *
- * Return: (Success) 0
+ * Return: (Success) positive number
+ * ------- (Fail) negative number
  */
 int free_data(sh_t *data)
 {
