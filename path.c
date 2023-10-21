@@ -1,135 +1,50 @@
 #include "shell.h"
-/**
- * pathCat - concats directory and user input to check for builitin
- * @dir: directory
- * @input: user input
- * Return: buffer to directory
- */
-char *pathCat(char *dir, char *input)
-{
-	int i, k, len1, len2;
-	char *buf;
-
-	len1 = _strlen(dir);
-	len2 = _strlen(input);
-
-	buf = malloc(4096);
-	buffers4(NULL, buf);
-
-	i = 0;
-	while (i < len1)
-	{
-		buf[i] = dir[i];
-		i++;
-	}
-	k = 0;
-	while (i < (len1 + len2))
-	{
-		buf[i] = input[k];
-		i++;
-		k++;
-	}
-	buf[i] = '\0';
-	return (buf);
-}
 
 /**
- * get_env - gets env in order to navigate PATH
- * @env: double pointer
- * Return: buf
+ * search_path - search file between the path
+ * @command: cmd
+ * Return: cmd path
  */
-char *get_env(char **env)
+
+char *search_path(char *command)
 {
-	int i, k;
-	char *start, *buf, *str = "PATH=";
+	char *path = _getenv("PATH"), *path_cpy;
+	char **path_split;
+	char *path_concat = NULL;
+	int i = 0, path_len = 0;
+	struct stat info;
 
-	i = 0;
-	while (env[i])
-	{
-		k = 0;
-		while (env[i][k] == str[k])
-		{
-			if (env[i][k + 1] == str[k + 1])
-			{
-				start = env[i];
-				break;
-			}
-			k++;
-		}
-		i++;
-	}
-	_strlen(start);
-	buf = malloc(4096);
-	buffers3(NULL, buf);
-	i = 0;
-	k = 0;
-	while (start[i] != '\0')
-	{
-		if (start[i] == ':')
-		{
-			buf[k] = '/';
-			k++;
-		}
-		buf[k] = start[i];
-		i++;
-		k++;
-	}
-	buf[k] = '/';
-	k++;
-	buf[k] = '\0';
-	return (buf);
-}
-/**
- * dirTok - split directories to tokens
- * @env: double pointer
- * Return: tokens
- */
-char **dirTok(char **env)
-{
-	char **tokens;
-	char *tok;
-	int i, j;
-	char *dir;
-
-	dir = get_env(env);
-	i = 0;
-	j = 0;
-	while (env[j])
-		j++;
-	tokens = malloc(4096);
-	buffers3(tokens, NULL);
-
-	tok = strtok(dir, " :");
-	while (tok != NULL)
-	{
-		tokens[i] = tok;
-		i++;
-		tok = strtok(NULL, " :");
-	}
-	tokens[i] = NULL;
-	return (tokens);
-}
-
-/**
- * checkPath - checks command input against path
- * @dir: dirctory tokens
- * @command: command line input
- * Return: full path on success
- */
-char *checkPath(char **dir, char *command)
-{
-	struct stat st;
-	char *fullPath;
-
-	if (command[0] == '/')
+	if (stat(command, &info) == 0)
 		return (command);
 
-	while (*dir)
+	path_cpy = malloc(_strlen(path) + 1);
+
+	path_cpy = _strcpy(path_cpy, path);
+	path_split = _split(path_cpy, ":");
+
+	while (path_split[i])
 	{
-		fullPath = pathCat(*dir, command);
-		if (stat(fullPath, &st) == 0)
-			return (fullPath);
-		dir++;
+		path_len = _strlen(path_split[i]);
+
+		if (path_split[i][path_len - 1] != '/')
+			path_concat = _strcat(path_split[i], "/");
+
+		path_concat = _strcat(path_split[i], command);
+
+		if (stat(path_concat, &info) == 0)
+			break;
+
+		i++;
 	}
-	return (NULL);
+
+	free(path_cpy);
+
+	if (!path_split[i])
+	{
+		free(path_split);
+		return (NULL);
+	}
+
+	free(path_split);
+	return (path_concat);
 }
