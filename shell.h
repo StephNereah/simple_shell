@@ -99,6 +99,8 @@ int print_error(sh_t *data);
 int write_history(sh_t *data);
 int _isalpha(int c);
 int exit_builtin(void);
+void print_environment(void);
+int execute_command(sh_t *data);
 
 /* -------------Builtins-----------------*/
 int abort_prg(sh_t *data);
